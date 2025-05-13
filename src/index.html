@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="shortcut icon" href="/favicon.png" />
+    <title>App</title>
+    <!-- Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Quicksand:wght@300..700&family=Roboto:ital,wght@0,100..900;1,100..900&family=Ubuntu:wght@300;400;500;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Font Awesome 5.15.4 -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+      integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+
+    <script type="module" src="/scripts/index.js"></script>
+  </head>
+  <body>
+    <header>
+      <button id="skip-link" class="skip-link">Menuju konten utama</button>
+
+      <div class="header-content container">
+        <a class="brand-name" href="#/">
+          <span class="tbrand-name__link__text"
+            >Res<span class="mix-color">List</span></span
+          >
+        </a>
+
+        <nav id="navigation-drawer" class="navigation-drawer">
+          <ul id="navlist-main" class="navigation-drawer__navlist-main"></ul>
+          <ul id="navlist" class="navigation-drawer__navlist"></ul>
+        </nav>
+
+        <button id="drawer-button" class="drawer-button">☰</button>
+      </div>
+    </header>
+
+    <main tabIndex="-1" id="main-content" class="main-content"></main>
+
+    <footer>
+      <div class="container">
+        <hr />
+        <div class="footer-content">
+          <a class="brand-name__link" href="#/">
+            <span class="brand-name__link__text">ResList</span>
+          </a>
+          <p class="copyright">&copy; 2025 by Hamsy. All rights reserved.</p>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>
