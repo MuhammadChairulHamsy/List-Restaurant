@@ -1,4 +1,5 @@
-import { addNewStory } from "../../data/api";
+
+import AddRestaurantPresenter from "./add-restaurant-presenter";
 import navigateTo from "../../utils/navigation";
 import Camera from "../../utils/camera";
 import L from "leaflet";
@@ -8,6 +9,7 @@ export default class AddRestaurantPage {
     this.photoBlob = null;
     this.fileBlob = null;
     this.camera = null;
+    this.presenter = new AddRestaurantPresenter(this);
   }
 
   getTemplate() {
@@ -106,7 +108,7 @@ export default class AddRestaurantPage {
   }
 
   initFormListener() {
-    document.querySelector("#add-restaurant-form")?.addEventListener("submit", async (e) => {
+    document.querySelector("#add-restaurant-form")?.addEventListener("submit", (e) => {
       e.preventDefault();
 
       const name = document.querySelector("#name")?.value;
@@ -126,24 +128,27 @@ export default class AddRestaurantPage {
         return;
       }
 
-      try {
-        await addNewStory({
-          description: `${name} - ${description}`,
-          photo: usedPhotoBlob,
-          lat,
-          lon,
-        });
-
-        this.camera?.stop();
-        navigateTo("#/home");
-      } catch (err) {
-        console.error("Gagal menambah restoran:", err);
-        alert("Terjadi kesalahan saat menambahkan restoran.");
-      }
+      this.presenter.addRestaurant({
+        name,
+        description,
+        photo: usedPhotoBlob,
+        lat,
+        lon,
+      });
     });
   }
 
-  /** Render & Lifecycle otomatis */
+  onSuccessAdd() {
+    this.camera?.stop();
+    alert("Restoran berhasil ditambahkan!");
+    navigateTo("#/home");
+  }
+
+  onFailedAdd(error) {
+    alert("Terjadi kesalahan saat menambahkan restoran.");
+    console.error(error);
+  }
+
   async renderTo(container) {
     container.innerHTML = this.getTemplate();
     await this.afterRender();

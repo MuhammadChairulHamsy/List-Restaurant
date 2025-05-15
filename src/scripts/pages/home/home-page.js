@@ -20,7 +20,7 @@ export default class HomePage {
       </section>
 
       <section class="list-restaurant">
-        <h1 class="section-title">Daftar <span>Restorant</span></h1>
+        <h1 class="section-title">Daftar <span>Restaurant</span></h1>
             <div class="reports-list__container">
             <div id="reports-list">
             </div>
