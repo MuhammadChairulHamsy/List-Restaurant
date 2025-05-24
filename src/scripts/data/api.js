@@ -9,6 +9,9 @@ const ENDPOINTS = {
 
   RESTAURANT: `${CONFIG.BASE_URL}/stories`,
   ADDRESTAURANTS: `${CONFIG.BASE_URL}/stories`,
+
+  SUBSCRIBE: `${CONFIG.BASE_URL}/notifications/subscribe`,
+  UNSUBSCRIBE: `${CONFIG.BASE_URL}/notifications/subscribe`,
 };
 
 export async function getRegistered({ name, email, password }) {
@@ -124,9 +127,46 @@ export async function addNewStoryGuestAccount({
   });
 }
 
+export async function subscribePushNotification({ endpoint, keys: { p256dh, auth } }) {
+  const accessToken = getAccessToken();
+  const data = JSON.stringify({
+    endpoint,
+    keys: { p256dh, auth },
+  });
 
-// const TOKEN =
-//   "BCCs2eonMI-6H2ctvFaWg-UYdDv387Vno_bzUzALpB442r2lCnsHmtrx8biyPi_E-1fSGABK_Qs_GlvPoJJqxbk.eyJ1aWQiOiJkZW1vX3VzZXIiLCJpYXQiOjE2Njg4MDgwMDB9.6rFwQhdAYlVkHX5FVFqhGLelaxFC1kMtFfTxmGlQsbs";
+  const fetchResponse = await fetch(ENDPOINTS.SUBSCRIBE, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${accessToken}`,
+    },
+    body: data,
+  });
+  const json = await fetchResponse.json();
 
+  return {
+    ...json,
+    ok: fetchResponse.ok,
+  };
+}
 
+export async function unsubscribePushNotification({ endpoint }) {
+  const accessToken = getAccessToken();
+  const data = JSON.stringify({ endpoint });
+
+  const fetchResponse = await fetch(ENDPOINTS.UNSUBSCRIBE, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${accessToken}`,
+    },
+    body: data,
+  });
+  const json = await fetchResponse.json();
+
+  return {
+    ...json,
+    ok: fetchResponse.ok,
+  };
+}
 

@@ -2,11 +2,18 @@ import { getActiveRoute } from "../routes/url-parser";
 import {
   generateMainNavigationListTemplate,
   generateAuthenticatedNavigationListTemplate,
+  generateSubscribeButtonTemplate,
+  generateUnsubscribeButtonTemplate,
   generateUnauthenticatedNavigationListTemplate,
 } from "../templates";
-import { setupSkipToContent, transtionHalper } from "../utils";
+import { isServiceWorkerAvailable ,setupSkipToContent, transtionHalper } from "../utils";
 import { getAccessToken, getLogout } from "../utils/auth";
 import routes from "../routes/routes";
+import {
+  isCurrentPushSubscriptionAvailable,
+  subscribe,
+  unsubscribe,
+} from "../utils/notification-helper";
 
 class App {
   #content;
@@ -51,11 +58,12 @@ class App {
 
   #setupNavigationList() {
     const isLogin = !!getAccessToken();
-    const navListMain = this.#navigationDrawer.children.namedItem('navlist-main');
-    const navList = this.#navigationDrawer.children.namedItem('navlist');
+    const navListMain =
+      this.#navigationDrawer.children.namedItem("navlist-main");
+    const navList = this.#navigationDrawer.children.namedItem("navlist");
 
     if (!isLogin) {
-      navListMain.innerHTML = '';
+      navListMain.innerHTML = "";
       navList.innerHTML = generateUnauthenticatedNavigationListTemplate();
       return;
     }
@@ -63,14 +71,43 @@ class App {
     navListMain.innerHTML = generateMainNavigationListTemplate();
     navList.innerHTML = generateAuthenticatedNavigationListTemplate();
 
-    const logoutButton = document.getElementById('logout-button');
-    logoutButton.addEventListener('click', (event) => {
+    const logoutButton = document.getElementById("logout-button");
+    logoutButton.addEventListener("click", (event) => {
       event.preventDefault();
-      if (confirm('Apakah Anda yakin ingin keluar?')) {
+      if (confirm("Apakah Anda yakin ingin keluar?")) {
         getLogout();
-        location.hash = '/login';
+        location.hash = "/login";
       }
     });
+  }
+
+  async #setupPushNotification() {
+    const pushNotificationTools = document.getElementById(
+      "push-notification-tools"
+    );
+    const isSubscribed = await isCurrentPushSubscriptionAvailable();
+
+    if (isSubscribed) {
+      pushNotificationTools.innerHTML = generateUnsubscribeButtonTemplate();
+      document
+        .getElementById("unsubscribe-button")
+        .addEventListener("click", () => {
+          unsubscribe().finally(() => {
+            this.#setupPushNotification();
+          });
+        });
+
+      return;
+    }
+
+    pushNotificationTools.innerHTML = generateSubscribeButtonTemplate();
+    document
+      .getElementById("subscribe-button")
+      .addEventListener("click", () => {
+        subscribe().finally(() => {
+          this.#setupPushNotification();
+        });
+      });
   }
 
   async renderPage() {
@@ -86,13 +123,13 @@ class App {
 
     const transition = transtionHalper({
       updateDOM: async () => {
-        if (typeof page.renderTo === 'function') {
+        if (typeof page.renderTo === "function") {
           // ✅ Pakai lifecycle modern (langsung render ke container)
           await page.renderTo(this.#content);
-        } else if (typeof page.render === 'function') {
+        } else if (typeof page.render === "function") {
           // ⚠️ Fallback kompatibilitas lama
           this.#content.innerHTML = await page.render();
-          if (typeof page.afterRender === 'function') {
+          if (typeof page.afterRender === "function") {
             await page.afterRender();
           }
         } else {
@@ -106,6 +143,10 @@ class App {
     transition.updateCallbackDone.then(() => {
       scrollTo({ top: 0, behavior: "instant" });
       this.#setupNavigationList();
+
+        if (isServiceWorkerAvailable()) {
+        this.#setupPushNotification();
+      }
     });
   }
 }

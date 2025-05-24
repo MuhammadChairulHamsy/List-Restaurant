@@ -380,8 +380,9 @@ form .form-buttons {
   color: #b66200;
 }
 
-*/ LOGIN,
-REGISTER PAGE */ .register-form-container,
+ /* LOGIN */
+/* REGISTER PAGE  */
+.register-form-container,
 .login-form-container {
   height: 100%;
   margin-inline: auto;
@@ -499,15 +500,6 @@ REGISTER PAGE */ .register-form-container,
   color: #777;
   margin-top: 0.5rem;
 }
-
-/* About-page */
-/* section .title-about {
-  color: #ffbf00;
-  margin-top: 1rem;  
-  text-align: center;
-  font-size: 1.8rem;
-  font-weight: 600;
-} */
 
 .about-section {
   padding: 4rem 1rem;
@@ -660,7 +652,7 @@ REGISTER PAGE */ .register-form-container,
 .video-container {
   position: relative;
   width: 100%;
-  padding-top: 56.25%; /* 16:9 aspect ratio */
+  padding-top: 56.25%; 
   background: #000;
   border-radius: 6px;
   overflow: hidden;
