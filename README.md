@@ -54,9 +54,9 @@ PWA & Offline Support:
     ```
 
 2. Install dependensi
-  ```bash
+    ```bash
     npm install
-  ```
+    ```
 
 3. Jalankan mode development
     ```bash
