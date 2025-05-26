@@ -1,4 +1,3 @@
-
 import AddRestaurantPresenter from "./add-restaurant-presenter";
 import navigateTo from "../../utils/navigation";
 import Camera from "../../utils/camera";
@@ -64,14 +63,16 @@ export default class AddRestaurantPage {
     });
     await this.camera.launch();
 
-    document.querySelector("#takePictureButton")?.addEventListener("click", async () => {
-      this.photoBlob = await this.camera.takePicture();
-      if (this.photoBlob) {
-        alert("Foto berhasil diambil dari kamera.");
-      } else {
-        alert("Gagal mengambil foto dari kamera.");
-      }
-    });
+    document
+      .querySelector("#takePictureButton")
+      ?.addEventListener("click", async () => {
+        this.photoBlob = await this.camera.takePicture();
+        if (this.photoBlob) {
+          alert("Foto berhasil diambil dari kamera.");
+        } else {
+          alert("Gagal mengambil foto dari kamera.");
+        }
+      });
   }
 
   initFileInput() {
@@ -88,6 +89,16 @@ export default class AddRestaurantPage {
   }
 
   initMap() {
+    delete L.Icon.Default.prototype._getIconUrl;
+
+    L.Icon.Default.mergeOptions({
+      iconRetinaUrl:
+        "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
+      iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
+      shadowUrl:
+        "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+    });
+
     const map = L.map("map").setView([-6.2, 106.816666], 13);
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
       attribution: "&copy; OpenStreetMap contributors",
@@ -108,39 +119,52 @@ export default class AddRestaurantPage {
   }
 
   initFormListener() {
-    document.querySelector("#add-restaurant-form")?.addEventListener("submit", (e) => {
-      e.preventDefault();
+    document
+      .querySelector("#add-restaurant-form")
+      ?.addEventListener("submit", (e) => {
+        e.preventDefault();
 
-      const name = document.querySelector("#name")?.value;
-      const description = document.querySelector("#description")?.value;
-      const lat = document.querySelector("#lat")?.value;
-      const lon = document.querySelector("#lon")?.value;
+        const name = document.querySelector("#name")?.value;
+        const description = document.querySelector("#description")?.value;
+        const lat = document.querySelector("#lat")?.value;
+        const lon = document.querySelector("#lon")?.value;
 
-      const usedPhotoBlob = this.photoBlob || this.fileBlob;
+        const usedPhotoBlob = this.photoBlob || this.fileBlob;
 
-      if (!usedPhotoBlob) {
-        alert("Silakan ambil foto dari kamera atau pilih file gambar.");
-        return;
-      }
+        if (!usedPhotoBlob) {
+          alert("Silakan ambil foto dari kamera atau pilih file gambar.");
+          return;
+        }
 
-      if (!lat || !lon) {
-        alert("Silakan pilih lokasi di peta.");
-        return;
-      }
+        if (!lat || !lon) {
+          alert("Silakan pilih lokasi di peta.");
+          return;
+        }
 
-      this.presenter.addRestaurant({
-        name,
-        description,
-        photo: usedPhotoBlob,
-        lat,
-        lon,
+        this.presenter.addRestaurant({
+          name,
+          description,
+          photo: usedPhotoBlob,
+          lat,
+          lon,
+        });
       });
-    });
   }
 
   onSuccessAdd() {
     this.camera?.stop();
     alert("Restoran berhasil ditambahkan!");
+
+    // ✅ Kirim notifikasi push jika izin diberikan
+    if ("Notification" in window && Notification.permission === "granted") {
+      navigator.serviceWorker.ready.then((registration) => {
+        registration.showNotification("Restoran Baru Ditambahkan!", {
+          body: "Lihat restoran barumu di halaman utama.",
+          tag: "new-restaurant",
+        });
+      });
+    }
+
     navigateTo("#/home");
   }
 

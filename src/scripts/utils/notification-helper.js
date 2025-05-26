@@ -1,21 +1,21 @@
-import { convertBase64ToUint8Array } from './index';
-import { VAPID_PUBLIC_KEY } from '../config';
+import { convertBase64ToUint8Array } from "./index";
+import { VAPID_PUBLIC_KEY } from "../config";
 import {
   subscribePushNotification,
   unsubscribePushNotification,
 } from "../data/api";
 
 export function isNotificationAvailable() {
-  return "Notification" in window;
+  return 'Notification' in window;
 }
 
 export function isNotificationGranted() {
-  return Notification.permission === "granted";
+  return Notification.permission === 'granted';
 }
 
 export async function requestNotificationPermission() {
   if (!isNotificationAvailable()) {
-    console.error("Notification API unsupported.");
+    console.error('Notification API unsupported.');
     return false;
   }
 
@@ -25,13 +25,13 @@ export async function requestNotificationPermission() {
 
   const status = await Notification.requestPermission();
 
-  if (status === "denied") {
-    alert("Izin notifikasi ditolak.");
+  if (status === 'denied') {
+    alert('Izin notifikasi ditolak.');
     return false;
   }
 
-  if (status === "default") {
-    alert("Izin notifikasi ditutup atau diabaikan.");
+  if (status === 'default') {
+    alert('Izin notifikasi ditutup atau diabaikan.');
     return false;
   }
 
@@ -54,21 +54,59 @@ export function generateSubscribeOptions() {
   };
 }
 
-export async function subscribe() {}
+export async function subscribe() {
+  if (!(await requestNotificationPermission())) {
+    return;
+  }
+
+  if (await isCurrentPushSubscriptionAvailable()) {
+    alert('Sudah berlangganan push notification.');
+    return;
+  }
+
+  console.log('Mulai berlangganan push notification...');
+
+  const failureSubscribeMessage = 'Langganan push notification gagal diaktifkan.';
+  const successSubscribeMessage = 'Langganan push notification berhasil diaktifkan.';
+
+  let pushSubscription;
+
+  try {
+    const registration = await navigator.serviceWorker.ready;
+    pushSubscription = await registration.pushManager.subscribe(generateSubscribeOptions());
+
+    const { endpoint, keys } = pushSubscription.toJSON();
+    const response = await subscribePushNotification({ endpoint, keys });
+
+    if (!response.ok) {
+      console.error('subscribe: response:', response);
+      alert(failureSubscribeMessage);
+
+      // Undo subscribe to push notification
+      await pushSubscription.unsubscribe();
+
+      return;
+    }
+
+    alert(successSubscribeMessage);
+  } catch (error) {
+    console.error('subscribe: error:', error);
+    alert(failureSubscribeMessage);
+
+    // Undo subscribe to push notification
+    await pushSubscription.unsubscribe();
+  }
+}
 
 export async function unsubscribe() {
-  const failureUnsubscribeMessage =
-    "Langganan push notification gagal dinonaktifkan.";
-  const successUnsubscribeMessage =
-    "Langganan push notification berhasil dinonaktifkan.";
+  const failureUnsubscribeMessage = 'Langganan push notification gagal dinonaktifkan.';
+  const successUnsubscribeMessage = 'Langganan push notification berhasil dinonaktifkan.';
 
   try {
     const pushSubscription = await getPushSubscription();
 
     if (!pushSubscription) {
-      alert(
-        "Tidak bisa memutus langganan push notification karena belum berlangganan sebelumnya."
-      );
+      alert('Tidak bisa memutus langganan push notification karena belum berlangganan sebelumnya.');
       return;
     }
 
@@ -77,7 +115,7 @@ export async function unsubscribe() {
 
     if (!response.ok) {
       alert(failureUnsubscribeMessage);
-      console.error("unsubscribe: response:", response);
+      console.error('unsubscribe: response:', response);
 
       return;
     }
@@ -94,6 +132,6 @@ export async function unsubscribe() {
     alert(successUnsubscribeMessage);
   } catch (error) {
     alert(failureUnsubscribeMessage);
-    console.error("unsubscribe: error:", error);
+    console.error('unsubscribe: error:', error);
   }
 }
