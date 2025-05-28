@@ -33,24 +33,6 @@ export function generateAuthenticatedNavigationListTemplate() {
     `;
 }
 
-// export function generateReportsListEmptyTemplate() {
-//   return `
-//     <div id="reports-list-empty" class="reports-list__empty">
-//       <h2>Tidak ada laporan yang tersedia</h2>
-//       <p>Saat ini, tidak ada laporan kerusakan fasilitas umum yang dapat ditampilkan.</p>
-//     </div>
-//   `;
-// }
-
-// export function generateReportsListErrorTemplate(message) {
-//   return `
-//     <div id="reports-list-error" class="reports-list__error">
-//       <h2>Terjadi kesalahan pengambilan daftar laporan</h2>
-//       <p>${message ? message : 'Gunakan jaringan lain atau laporkan error ini.'}</p>
-//     </div>
-//   `;
-// }
-
 export function generateReportItemTemplate({
   id,
   description,

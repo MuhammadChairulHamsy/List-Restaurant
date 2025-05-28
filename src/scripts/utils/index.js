@@ -49,12 +49,14 @@ export async function registerServiceWorker() {
     console.log('Service Worker API unsupported');
     return;
   }
- 
+
   try {
-    const registration = await navigator.serviceWorker.register('/sw.bundle.js');
-    console.log('Service worker telah terpasang', registration);
+    const { registerSW } = await import('virtual:pwa-register');
+    registerSW();
+    console.log('Service worker berhasil didaftarkan via vite-plugin-pwa');
   } catch (error) {
-    console.log('Failed to install service worker:', error);
+    console.log('Gagal mendaftarkan service worker:', error);
   }
 }
+
 

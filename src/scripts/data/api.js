@@ -6,10 +6,10 @@ const ENDPOINTS = {
   // Auth
   REGISTER: `${CONFIG.BASE_URL}/register`,
   LOGIN: `${CONFIG.BASE_URL}/login`,
-
+  
   RESTAURANT: `${CONFIG.BASE_URL}/stories`,
   ADDRESTAURANTS: `${CONFIG.BASE_URL}/stories`,
-
+  
   SUBSCRIBE: `${CONFIG.BASE_URL}/notifications/subscribe`,
   UNSUBSCRIBE: `${CONFIG.BASE_URL}/notifications/subscribe`,
 };

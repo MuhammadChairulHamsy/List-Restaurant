@@ -6,9 +6,13 @@ import {
   generateUnsubscribeButtonTemplate,
   generateUnauthenticatedNavigationListTemplate,
 } from "../templates";
-import { isServiceWorkerAvailable ,setupSkipToContent, transtionHalper } from "../utils";
+import {
+  isServiceWorkerAvailable,
+  setupSkipToContent,
+  transtionHalper,
+} from "../utils";
 import { getAccessToken, getLogout } from "../utils/auth";
-import routes from "../routes/routes";
+import { resolveRoute } from "../routes/routes";
 import {
   isCurrentPushSubscriptionAvailable,
   subscribe,
@@ -112,29 +116,20 @@ class App {
 
   async renderPage() {
     const url = getActiveRoute();
-    const route = routes[url]?.();
-
-    if (!route) {
-      this.#content.innerHTML = `<section class="mt-[8rem] text-center"><h1 class="text-2xl font-bold">404 - Halaman Tidak Ditemukan</h1></section>`;
-      return;
-    }
-
-    const page = route;
+    const page = resolveRoute(url);
 
     const transition = transtionHalper({
       updateDOM: async () => {
         if (typeof page.renderTo === "function") {
-          // ✅ Pakai lifecycle modern (langsung render ke container)
           await page.renderTo(this.#content);
         } else if (typeof page.render === "function") {
-          // ⚠️ Fallback kompatibilitas lama
           this.#content.innerHTML = await page.render();
           if (typeof page.afterRender === "function") {
             await page.afterRender();
           }
         } else {
           console.error("Page tidak memiliki render atau renderTo method.");
-          this.#content.innerHTML = `<section class="mt-[8rem] text-center"><h1 class="text-2xl font-bold">Invalid Page Component</h1></section>`;
+          this.#content.innerHTML = `<section><h1 class="text-2xl font-bold">Invalid Page Component</h1></section>`;
         }
       },
     });
@@ -144,7 +139,7 @@ class App {
       scrollTo({ top: 0, behavior: "instant" });
       this.#setupNavigationList();
 
-        if (isServiceWorkerAvailable()) {
+      if (isServiceWorkerAvailable()) {
         this.#setupPushNotification();
       }
     });
