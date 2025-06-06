@@ -689,6 +689,26 @@ form .form-buttons {
   color: #3498db;
 }
 
+.report-item__actions {
+  margin-top: 10px;
+  text-align: right;
+}
+
+.delete-button {
+  background-color: #dc2626;
+  color: #fffdf7;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.delete-button:hover {
+  background-color: #b91c1c;
+}
+
+
 /* FOOTER */
 footer {
   margin-block-start: 50px;

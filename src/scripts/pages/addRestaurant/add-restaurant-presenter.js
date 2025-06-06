@@ -6,7 +6,7 @@ export default class AddRestaurantPresenter {
     this.view = view;
   }
 
-  async addRestaurant({ name, description, photo, lat, lon }) {
+  async addRestaurant({ name, description, photo, lat, lon, saveToLocalOnly = false }) {
     const id = `${Date.now()}-${Math.random()}`;
     const photoBase64 = await this.#convertBlobToBase64(photo);
 
@@ -20,8 +20,20 @@ export default class AddRestaurantPresenter {
       createdAt: new Date().toISOString(),
     };
 
+    if (saveToLocalOnly) {
+      // ⬅️ Simpan hanya ke IndexedDB (tombol simpan)
+      try {
+        await Database.putReport(restaurantData);
+        alert("Data berhasil disimpan secara lokal!");
+      } catch (error) {
+        console.error("Gagal simpan lokal:", error);
+        alert("Gagal menyimpan ke IndexedDB.");
+      }
+      return;
+    }
+
+    // ⬅️ Form submit: kirim ke API, lalu simpan jika gagal
     try {
-      // Simpan ke API (jika online)
       await addNewStory({
         description: `${name} - ${description}`,
         photo,
@@ -29,26 +41,25 @@ export default class AddRestaurantPresenter {
         lon,
       });
     } catch (error) {
-      console.warn("Gagal mengirim ke API, lanjut simpan ke lokal:", error);
+      console.warn("Gagal kirim ke API, simpan lokal:", error);
+      try {
+        await Database.putReport(restaurantData);
+      } catch (dbError) {
+        console.error("Gagal simpan ke IndexedDB:", dbError);
+        this.view.onFailedAdd(dbError);
+        return;
+      }
     }
 
-    try {
-      // Selalu simpan ke IndexedDB
-      await Database.putReport(restaurantData);
-      this.view.onSuccessAdd();
-    } catch (dbError) {
-      console.error("Gagal simpan ke IndexedDB:", dbError);
-      this.view.onFailedAdd(dbError);
-    }
+    this.view.onSuccessAdd();
   }
 
- #convertBlobToBase64(blob) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onloadend = () => resolve(reader.result);
-    reader.onerror = reject;
-    reader.readAsDataURL(blob);
-  });
-}
-
+  #convertBlobToBase64(blob) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  }
 }

@@ -2,6 +2,7 @@ import AddRestaurantPresenter from "./add-restaurant-presenter";
 import navigateTo from "../../utils/navigation";
 import Camera from "../../utils/camera";
 import L from "leaflet";
+import Database from "../../data/database";
 
 export default class AddRestaurantPage {
   constructor() {
@@ -50,6 +51,7 @@ export default class AddRestaurantPage {
           <input type="hidden" id="lon" name="lon" required />
 
           <button type="submit">Tambah Restoran</button>
+          <button type="button" id="saveToIndexedDB">Simpan Restaurant</button>
         </form>
       </section>
     `;
@@ -151,11 +153,60 @@ export default class AddRestaurantPage {
       });
   }
 
+  initSaveToIndexedDBListener() {
+    document.querySelector("#saveToIndexedDB")?.addEventListener("click", async () => {
+      const name = document.querySelector("#name")?.value;
+      const description = document.querySelector("#description")?.value;
+      const lat = document.querySelector("#lat")?.value;
+      const lon = document.querySelector("#lon")?.value;
+
+      const usedPhotoBlob = this.photoBlob || this.fileBlob;
+
+      if (!name || !description || !lat || !lon) {
+        alert("Semua data dan lokasi harus diisi.");
+        return;
+      }
+
+      if (!usedPhotoBlob) {
+        alert("Silakan ambil atau pilih foto.");
+        return;
+      }
+
+      try {
+        const photoBase64 = await this.convertBlobToBase64(usedPhotoBlob);
+
+        const report = {
+          id: +new Date(), // Unique ID
+          name,
+          description,
+          lat: parseFloat(lat),
+          lon: parseFloat(lon),
+          createdAt: new Date().toISOString(),
+          photoUrl: photoBase64,
+        };
+
+        await Database.putReport(report);
+        alert("Data berhasil disimpan di List Stored!");
+      } catch (error) {
+        console.error("IndexedDB Error:", error);
+        alert("Gagal menyimpan ke IndexedDB.");
+      }
+    });
+  }
+
+  convertBlobToBase64(blob) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onerror = reject;
+      reader.onload = () => resolve(reader.result);
+      reader.readAsDataURL(blob);
+    });
+  }
+
   onSuccessAdd() {
     this.camera?.stop();
     alert("Restoran berhasil ditambahkan!");
 
-    // ✅ Kirim notifikasi push jika izin diberikan
     if ("Notification" in window && Notification.permission === "granted") {
       navigator.serviceWorker.ready.then((registration) => {
         registration.showNotification("Restoran Baru Ditambahkan!", {
@@ -183,5 +234,6 @@ export default class AddRestaurantPage {
     this.initFileInput();
     this.initMap();
     this.initFormListener();
+    this.initSaveToIndexedDBListener();
   }
 }

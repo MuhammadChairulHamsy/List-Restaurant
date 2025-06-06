@@ -15,6 +15,7 @@ export function generateMainNavigationListTemplate() {
       <li><a id="list-home" href="#/">Home</a></li>
       <li><a id="list-about" href="#/about">About</a></li>
       <li><a id="list-add-restaurant" href="#/addRestaurant">AddRestaurant <i class="fas fa-plus"></i></a></li>
+      <li><a id="list-button" class="list-button" href="#/liststored">List Stored</a></li>
       `;
 }
 
@@ -41,34 +42,38 @@ export function generateReportItemTemplate({
   createdAt,
   lat,
   lon,
+  isLocal = false,
 }) {
   return `
-  <div tabindex="0" class="report-item" data-reportid="${id}">
-    <img class="report-item__image" src="${photoUrl}" alt="${description}">
-    <div class="report-item__body">
-      <div class="report-item__main">
-        <h2 id="report-title" class="report-item__title">${description}</h2>
-        <div class="report-item__more-info">
-          <div class="report-item__createdat">
-            <i class="fas fa-calendar-alt"></i> ${showFormattedDate(createdAt, 'id-ID')}
-          </div>
-          <div class="report-item__location">
-            <i class="fas fa-map"></i> (${lat}, ${lon})
+    <div tabindex="0" class="report-item" data-reportid="${id}">
+      <img class="report-item__image" src="${photoUrl}" alt="${description}">
+      <div class="report-item__body">
+        <div class="report-item__main">
+          <h2 class="report-item__title">${description}</h2>
+          <div class="report-item__more-info">
+            <div class="report-item__createdat">
+              <i class="fas fa-calendar-alt"></i> ${showFormattedDate(createdAt, "id-ID")}
+            </div>
+            <div class="report-item__location">
+              <i class="fas fa-map"></i> (${lat}, ${lon})
+            </div>
           </div>
         </div>
-      </div>
-      <div id="report-description" class="report-item__description">
-        ${description}
-      </div>
-      <div class="report-item__more-info">
-        <div class="report-item__author">
-          Dibuat oleh: ${name}
-        </div>
+        <div class="report-item__description">${description}</div>
+        <div class="report-item__author">Dibuat oleh: ${name}</div>
+        ${
+          isLocal
+            ? `<div class="report-item__actions">
+                <button class="delete-button" data-id="${id}">🗑️ Hapus</button>
+              </div>`
+            : ""
+        }
       </div>
     </div>
-  </div>
   `;
 }
+
+
 
 export function generateSubscribeButtonTemplate() {
   return `

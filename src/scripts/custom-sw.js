@@ -93,6 +93,7 @@ self.addEventListener("push", (event) => {
   };
 
   event.waitUntil(
+  
     self.registration.showNotification(title, options).catch((error) => {
       console.error("Error menampilkan notifikasi:", error);
     })

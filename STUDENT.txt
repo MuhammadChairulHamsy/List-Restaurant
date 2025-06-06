@@ -1,2 +1,2 @@
-APP_URL=<https://list-restaurant.netlify.app/>
+APP_URL=<https://listrest.netlify.app/>
 MAP_SERVICE_API_KEY= '8ucoIj2ACV9LDWYTonVA';

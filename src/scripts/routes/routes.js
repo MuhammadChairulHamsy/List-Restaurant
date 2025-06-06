@@ -4,6 +4,7 @@ import HomePage from "../pages/home/home-page";
 import AboutPage from "../pages/about/about-page";
 import AddRestaurantPage from "../pages/addRestaurant/add-restaurant-page";
 import NotFoundPage from "../pages/notFound/not-found-page";
+import ListStoredPage from "../pages/listStored/list-stored-page";
 import { checkAuthenticatedRoute, checkUnauthenticatedRouteOnly } from '../utils/auth';
 
 const routes = {
@@ -12,6 +13,7 @@ const routes = {
   '/': () => checkAuthenticatedRoute(new HomePage()),
   '/about': () => checkAuthenticatedRoute(new AboutPage()),
   '/addrestaurant': () => checkAuthenticatedRoute(new AddRestaurantPage()),
+  '/liststored': () => checkAuthenticatedRoute(new ListStoredPage()),
 };
 
 export function resolveRoute(path) {
